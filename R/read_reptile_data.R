@@ -7,6 +7,6 @@
 #'
 #' @export
 read_reptile_data <- function(){
-  repdb <- read.csv(here("data", "reptile_checklist_2023_09.csv"))
+  repdb <- read.csv(here::here("data", "reptile_checklist_2023_09.csv"))
   return(repdb)
 }

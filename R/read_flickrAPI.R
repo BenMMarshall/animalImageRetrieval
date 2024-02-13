@@ -7,7 +7,6 @@
 #'
 #' @export
 read_flickrAPI <- function(){
-
-
-
+  apiKey <- scan(here::here("notebook", "flickrAPIkey.txt"), character())
+  return(apiKey)
 }

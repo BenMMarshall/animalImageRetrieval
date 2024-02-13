@@ -10,16 +10,21 @@ library(here)
 
 # Set target options:
 tar_option_set(
-  packages = c("tibble", "here"), # packages that your targets need to run
+  packages = c("tibble", "here",
+               "spocc", "dplyr", "readr"), # packages that your targets need to run
   format = "rds" # default storage format
   # Set other options as needed.
 )
 
-dir.create(here::here("data", "images"), showWarnings = FALSE)
-dir.create(here::here("data", "images", "flickr"), showWarnings = FALSE)
-dir.create(here::here("data", "images", "inat"), showWarnings = FALSE)
-dir.create(here::here("data", "images", "wiki"), showWarnings = FALSE)
-dir.create(here::here("data", "images", "hmap"), showWarnings = FALSE)
+dir.create(here::here("data"), showWarnings = FALSE)
+dir.create(here::here("data", "flickr"), showWarnings = FALSE)
+dir.create(here::here("data", "inat"), showWarnings = FALSE)
+dir.create(here::here("data", "wiki"), showWarnings = FALSE)
+dir.create(here::here("data", "hmap"), showWarnings = FALSE)
+dir.create(here::here("data", "flickr", "images"), showWarnings = FALSE)
+dir.create(here::here("data", "inat", "images"), showWarnings = FALSE)
+dir.create(here::here("data", "wiki", "images"), showWarnings = FALSE)
+dir.create(here::here("data", "hmap", "images"), showWarnings = FALSE)
 
 # tar_make_clustermq() configuration (okay to leave alone):
 options(clustermq.scheduler = "multiprocess")
@@ -31,7 +36,7 @@ options(clustermq.scheduler = "multiprocess")
 tar_source()
 # source("other_functions.R") # Source other scripts as needed. # nolint
 
-reptileData <- read_reptile_data()
+reptileData <- animalImageRetrieval::read_reptile_data()
 
 values_family <- data.frame(family = unique(reptileData$Family))
 
@@ -49,19 +54,19 @@ tarList_imageSearch <- list(
     values = values_family,
     tar_target(
       name = tar_flickrMetadata,
-      command = get_urls_flickr(tar_reptileData, subset = family, tar_flickrAPI)
+      command = get_urls_flickr(reptileData = tar_reptileData, subset = family, flickrAPI = tar_flickrAPI)
     ),
     tar_target(
       name = tar_inatMetadata,
-      command = get_urls_inat(tar_reptileData, subset = family)
+      command = get_urls_inat(reptileData = tar_reptileData, subset = family)
     ),
     tar_target(
       name = tar_wikiMetadata,
-      command = get_urls_wiki(tar_reptileData, subset = family)
+      command = get_urls_wiki(reptileData = tar_reptileData, subset = family)
     ),
     tar_target(
       name = tar_hmapMetadata,
-      command = get_urls_hmap(tar_reptileData, subset = family)
+      command = get_urls_hmap(reptileData = tar_reptileData, subset = family)
     ),
     tar_target(
       name = tar_flickrImages,
