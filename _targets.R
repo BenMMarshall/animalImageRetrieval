@@ -11,7 +11,15 @@ library(here)
 # Set target options:
 tar_option_set(
   packages = c("tibble", "here",
-               "spocc", "dplyr", "readr"), # packages that your targets need to run
+               "spocc", "dplyr", "readr",
+               "downloader",
+               "xml2",
+               "rvest",
+               "dplyr",
+               "stringr",
+               "jsonlite",
+               "stringr",
+               "urltools"), # packages that your targets need to run
   format = "rds" # default storage format
   # Set other options as needed.
 )
@@ -40,6 +48,14 @@ reptileData <- animalImageRetrieval::read_reptile_data()
 
 values_family <- data.frame(family = unique(reptileData$Family))
 
+values_orders <-
+  data.frame(order = c("Amphisbaenia",
+    "Crocodylia",
+    "Lacertilia",
+    "Serpentes",
+    "Sphenodon",
+    "Testudines"))
+
 # Replace the target list below with your own:
 tarList_imageSearch <- list(
   tar_target(
@@ -53,66 +69,69 @@ tarList_imageSearch <- list(
   tar_map(
     values = values_family,
     tar_target(
-      name = tar_flickrMetadata,
+      name = tar_flickrUrldata,
       command = get_urls_flickr(reptileData = tar_reptileData, subset = family, flickrAPI = tar_flickrAPI)
     ),
     tar_target(
-      name = tar_inatMetadata,
+      name = tar_inatUrldata,
       command = get_urls_inat(reptileData = tar_reptileData, subset = family)
     ),
     tar_target(
-      name = tar_wikiMetadata,
+      name = tar_wikiUrldata,
       command = get_urls_wiki(reptileData = tar_reptileData, subset = family)
     ),
     tar_target(
-      name = tar_hmapMetadata,
-      command = get_urls_hmap(reptileData = tar_reptileData, subset = family)
-    ),
-    tar_target(
       name = tar_flickrImages,
-      command = get_imgs_flickr(tar_flickrMetadata, flickrAPI)
+      command = get_imgs(urlData = tar_flickrUrldata, source = "flickr")
     ),
     tar_target(
       name = tar_inatImages,
-      command = get_imgs_inat(tar_inatMetadata)
+      command = get_imgs(urlData = tar_inatUrldata, source = "inat")
     ),
     tar_target(
       name = tar_wikiImages,
-      command = get_imgs_wiki(tar_wikiMetadata),
+      command = get_imgs(urlData = tar_wikiUrldata, source = "wiki")
+    )
+  ),
+  tar_map(
+    values = values_orders,
+    tar_target(
+      name = tar_hmapUrldata,
+      command = get_urls_hmap(reptileData = tar_reptileData, subset = order)
     ),
     tar_target(
       name = tar_hmapImages,
-      command = get_imgs_hmap(tar_hmapMetadata)
+      command = get_imgs_hmap(tar_hmapUrldata, source = "hmap")
     )
   )
 )
 
 tarlist_metadata <- tar_combine(
-  tar_metadataCompiled,
-  tarList_imageSearch[[3]][grep("Metadata", names(tarList_imageSearch[[3]]))],
-  # command = list(!!!.x),
-  command = rbind(!!!.x)
+  name = tar_metadataCompiled,
+  list(tarList_imageSearch[[3]][grep("Urldata", names(tarList_imageSearch[[3]]))],
+       tarList_imageSearch[[4]][grep("Urldata", names(tarList_imageSearch[[4]]))]),
+  command = list(!!!.x)
 )
 
-tarlist_imagedata <- tar_combine(
-  tar_imagedataCompiled,
-  tarList_imageSearch[[3]][grep("Images", names(tarList_imageSearch[[3]]))],
-  # command = list(!!!.x),
-  command = rbind(!!!.x)
-)
+# tarlist_imagedata <- tar_combine(
+#   tar_imagedataCompiled,
+#   tarList_imageSearch[[3]][grep("Images", names(tarList_imageSearch[[3]]))],
+#   # command = list(!!!.x),
+#   command = rbind(!!!.x)
+# )
 
 tarList_outputs <- list(
   tar_target(
     name = tar_metadataSummary,
     command = summary_metadata(tar_metadataCompiled)
-  ),
-  tar_target(
-    name = tar_imagesSummary,
-    command = summary_images(tar_imagedataCompiled)
   )
+  # tar_target(
+  #   name = tar_imagesSummary,
+  #   command = summary_images(tar_imagedataCompiled)
+  # )
 )
 
 list(tarList_imageSearch,
      tarlist_metadata,
-     tarlist_imagedata,
+     # tarlist_imagedata,
      tarList_outputs)

@@ -23,8 +23,8 @@ get_urls_inat <- function(reptileData, subset){
   dir.create(here("data", "inat", "images"), showWarnings = FALSE)
   # this removes all the species that are NULL prior to the last one that has
   # data, a way of jump starting
-  if("inat_data_list.rds" %in% list.files(here("data", "inat"))){
-    full.data.list <- readRDS(here("data", "inat", "inat_data_list.rds"))
+  if(paste0(subset, "_inat_data_list.rds") %in% list.files(here("data", "inat"))){
+    full.data.list <- readRDS(here("data", "inat", paste0(subset, "_inat_data_list.rds")))
     # read in progress, and check which ones have data and not repeat those
     full.data.list[sapply(full.data.list, is.null)] <- NULL
     species <- species[!species %in% names(full.data.list)]
@@ -54,8 +54,8 @@ get_urls_inat <- function(reptileData, subset){
     # if("inat_data_list.rds" %in% list.files(here("data", "inat"))){
     #   full.data.list <- readRDS(here("data", "inat", "inat_data_list.rds"))
     # }
-    if("inat_meta_list.rds" %in% list.files("./Data")){
-      meta.list <- readRDS(here("data", "inat", "inat_meta_list.rds"))
+    if(paste0(subset, "_inat_meta_list.rds") %in% list.files("./Data")){
+      meta.list <- readRDS(here("data", "inat", paste0(subset, "_inat_meta_list.rds")))
     }
     if(!is.null(full.data.list[[sp]])){
       print("- Already retrieved")
@@ -94,7 +94,7 @@ get_urls_inat <- function(reptileData, subset){
       meta.res$photos <- NA
       meta.list[[sp]] <- meta.res
       print("- None found")
-      saveRDS(meta.list, file = here("data", "inat", "inat_meta_list.rds"))
+      saveRDS(meta.list, file = here("data", "inat", paste0(subset, "_inat_meta_list.rds")))
       {next}
     }
 
@@ -106,7 +106,7 @@ get_urls_inat <- function(reptileData, subset){
     if(length(sp.df$observation_photos[!is.null(sp.df$observation_photos)]) == 0){
       meta.res$photos <- NA
       meta.list[[sp]] <- meta.res
-      saveRDS(meta.list, file = here("data", "inat", "inat_meta_list.rds"))
+      saveRDS(meta.list, file = here("data", "inat", paste0(subset, "_inat_meta_list.rds")))
       {next}
     }
 
@@ -147,8 +147,8 @@ get_urls_inat <- function(reptileData, subset){
     # second save to help ID errors
     write_csv(x = full.data, file = here("data", "inat", paste0(sp, ".csv")))
 
-    saveRDS(full.data.list, file = here("data", "inat", "inat_data_list.rds"))
-    saveRDS(meta.list, file = here("data", "inat", "inat_meta_list.rds"))
+    saveRDS(full.data.list, file = here("data", "inat", paste0(subset, "_inat_data_list.rds")))
+    saveRDS(meta.list, file = here("data", "inat", paste0(subset, "_inat_meta_list.rds")))
   } # for loop end
   # put them all together, missing columns infilled with NA
   complete.inat <- plyr::rbind.fill(full.data.list, fill = TRUE)
