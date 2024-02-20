@@ -45,19 +45,29 @@ get_imgs <- function(urlData, source, flickrAPI){
     imageURLS <- urlData$voucherURL
   }
 
-  for(r in 1:nrow(urlData)){
-
-    if(!is.na(imageURLS[r])){
-
-      if(source == "flickr"){
-        # NEED TO USE FLICKR API
-      }
-
-      download(url = urlData$image.url[r],
-               destfile = here::here("data", source, "images",
-                                     urlData$imageNames[r]))
-    }
-
+  if(source == "flickr"){
+    listUrls <- str_split(urlData$staticURL, "/")
+    imageNames <- unlist(lapply(listUrls, function(x){
+      paste(x[(length(x)-1):length(x)], collapse = "")
+    }))
+    urlData$imageNames <- paste0(urlData$search, "_IMG_", imageNames)
+    imageURLS <- urlData$staticURL
   }
 
+  for(r in 1:nrow(urlData)){
+    # r <- 4
+    if(!is.na(imageURLS[r])){
+
+      if(!urlData$imageNames[r] %in% list.files(here::here("data", source, "images"))){
+        download(url = imageURLS[r],
+                 destfile = here::here("data", source, "images",
+                                       urlData$imageNames[r]),
+                 mode = "wb")
+        print(paste("Image Downloaded:", urlData$imageNames[r]))
+      } else {
+        print("Already downloaded")
+        {next}
+      }
+    }
+  }
 }

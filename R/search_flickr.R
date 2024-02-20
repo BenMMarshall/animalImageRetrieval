@@ -109,6 +109,37 @@ search_flickr <- function(search, api_key, tags, tag_m,
   #   names(na.df) <- names(images.df)
   #   return(na.df)
   # }
+  staticURLs <- vector(mode = "character", length = length(unique(images.df$photos.photo.id)))
+  i <- 0
+  for(imgID in unique(images.df$photos.photo.id)){
+    i <- i+1
+    # imgID <- unique(images.df$photos.photo.id)[1]
+    URLbase <- "https://www.flickr.com/services/rest/?method=flickr.photos.getSizes"
+    URL.call <- paste0(URLbase, "&api_key=", api_key,
+                       "&photo_id=", imgID,
+                       "&format=json&nojsoncallback=1"
+    )
+    raw.data <- RCurl::getURL(URL.call, ssl.verifypeer = TRUE)
+
+    # json.data <- jsonlite::fromJSON(raw.data)
+    json.data <- tryCatch(jsonlite::fromJSON(raw.data),
+                          error = function(e) "Parse error")
+
+    if(json.data$sizes$candownload == 1){
+      if("Original" %in% json.data$sizes$size$label){
+        downURL <- json.data$sizes$size[json.data$sizes$size$label == "Original",]$source
+      } else {
+        downURL <- json.data$sizes$size[json.data$sizes$size$height == max(json.data$sizes$size$height),]$source
+      }
+    } else {
+      downURL <- "Download not enabled"
+    }
+    staticURLs[i] <- downURL
+
+    print("Waiting... give the API a break")
+    Sys.sleep(5)
+  }
+  images.df$staticURL <- staticURLs
 
   images.df$search <- search
   images.df <- images.df %>%
