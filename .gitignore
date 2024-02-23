@@ -1,4 +1,6 @@
 /data/
+# exception to the rule
+!data/reptile_checklist_2023_09.csv
 
 # History files
 .Rhistory

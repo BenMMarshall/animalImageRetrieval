@@ -1,9 +1,17 @@
 #' Get info from flickr searches
 #'
 #' @name search_flickr
-#' @description A
-#' @param abc abc
-#' @return a
+#' @description A function to call the flickr API to run a search for images,
+#'   then a second call to get the static image URLs.
+#' @param search search text string
+#' @param api_key Required. flickr API key
+#' @param tags e.g., c("snake", "reptile", "tortoise", "turtle", "lizard", "crocodile", "alligator",
+#' "crocodilian", "amphisbaenian", "tuatara", "gharial", "caiman")
+#' @param tag_m "any"
+#' @param content_type "1"
+#' @param extra_call "date_taken,geo,license"
+#' @param page_call "250"
+#' @return A list of two dataframes, one of the meta information, one of the image information.
 #'
 #' @export
 search_flickr <- function(search, api_key, tags, tag_m,
@@ -99,7 +107,7 @@ search_flickr <- function(search, api_key, tags, tag_m,
       mapply(as.numeric, data[,c("photos.photo.latitude", "photos.photo.longitude")])
     all.calls[[page]] <- data
     print("Waiting... give the API a break")
-    Sys.sleep(5)
+    Sys.sleep(2)
   }
   images.df <- do.call(rbind, all.calls)
 
@@ -137,7 +145,7 @@ search_flickr <- function(search, api_key, tags, tag_m,
     staticURLs[i] <- downURL
 
     print("Waiting... give the API a break")
-    Sys.sleep(5)
+    Sys.sleep(1.5)
   }
   images.df$staticURL <- staticURLs
 

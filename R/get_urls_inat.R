@@ -1,18 +1,21 @@
 #' Search for image locations on iNat
 #'
 #' @name get_urls_inat
-#' @description A
-#' @param abc abc
-#' @return a
+#' @description Will search inaturalist using the spocc package and incrementally save the results.
+#' @param reptileData Reptile database data from the read_reptile_data() function
+#' @param subset Required. A family subset to work with, can be a single family.
+#' @param inatLimit Limit of the number of inat observations to collect, hard limit of 10000. Default of 10000.
+#' @return A dataframe of photos
 #'
 #' @export
-get_urls_inat <- function(reptileData, subset){
+get_urls_inat <- function(reptileData, subset, inatLimit = 10000){
   # reptileData <- animalImageRetrieval::read_reptile_data()
   # subset <- "Blanidae"
   subsertReptileData <- reptileData[reptileData$Family == subset,]
-
+  # pulls out the species, so we can save them one at a time
   species <- subsertReptileData$Species
 
+  # sets up several lists to store the progress
   full.data.list <- vector("list", length = length(species))
   names(full.data.list) <- species
   meta.list <- vector("list", length = length(species))
@@ -38,6 +41,7 @@ get_urls_inat <- function(reptileData, subset){
   }
 
   previous <- Sys.time()
+  # loop trhough one species at a time
   for(sp in species){
     print(sp)
     # sp <- species[1]
@@ -51,9 +55,6 @@ get_urls_inat <- function(reptileData, subset){
     # sp <- "Acanthophis laevis"
     # sp <- "Nephrurus eromanga"
 
-    # if("inat_data_list.rds" %in% list.files(here("data", "inat"))){
-    #   full.data.list <- readRDS(here("data", "inat", "inat_data_list.rds"))
-    # }
     if(paste0(subset, "_inat_meta_list.rds") %in% list.files("./Data")){
       meta.list <- readRDS(here("data", "inat", paste0(subset, "_inat_meta_list.rds")))
     }
@@ -80,7 +81,10 @@ get_urls_inat <- function(reptileData, subset){
       Sys.sleep(5)
     }
 
-    inat.df <- occ(query = sp, from = "inat", limit = 10000,
+    # this is the most important part of the function, everything else is just
+    # organising and cleaning. If you want to use alternative organisation this
+    # is really the only part you need to take
+    inat.df <- occ(query = sp, from = "inat", limit = inatLimit,
                    inatopts = list(quality = "research"),
                    throw_warnings = FALSE)
 
@@ -90,6 +94,7 @@ get_urls_inat <- function(reptileData, subset){
                            found = inat.df$inat$meta$found,
                            returned = inat.df$inat$meta$returned)
 
+    # saves the meta information and full info if no observations are found
     if(meta.res$found == 0){
       meta.res$photos <- NA
       meta.list[[sp]] <- meta.res
@@ -111,7 +116,9 @@ get_urls_inat <- function(reptileData, subset){
     }
 
     print("Merge begin")
-
+    # this loop pulls out the photo information and creates a new full dataframe,
+    # where instead of each row == an observation, each row now becomes a photo with
+    # the observation duplicated
     full.list <- vector("list", length = nrow(sp.df))
     for(j in 1:nrow(sp.df)){
 
@@ -128,7 +135,9 @@ get_urls_inat <- function(reptileData, subset){
 
     }
     full.data <- do.call(rbind, full.list)
-
+    # swap out the square.jpg for large to ensure we get a decent version of the
+    # image, seems like original is not always available, so large is a safer
+    # bet(?)
     full.data$photo.url <- sub("square", "large", full.data$photo.url)
     full.data$reptiledbSpecies <- sp
 

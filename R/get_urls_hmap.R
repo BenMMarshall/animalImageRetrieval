@@ -1,21 +1,27 @@
 #' Search for image locations on hmap
 #'
 #' @name get_urls_hmap
-#' @description A
-#' @param abc abc
-#' @return a
+#' @description A function to find and pull out image locations for HerpMapper.
+#'   Unlike other functions for sources this one requires an order by order
+#'   approach used for Herpmapper.
+#' @param reptileData Reptile database data from the read_reptile_data()
+#'   function
+#' @param subset Required. For herpmapper this has to be an Order from
+#'   c("Amphisbaenia", "Crocodylia", "Lacertilia", "Serpentes", "Sphenodon",
+#'   "Testudines")
+#' @return A dataframe of image information
 #'
 #' @export
 get_urls_hmap <- function(reptileData, subset){
 
   # subset <- "Amphisbaenia"
   orders <- subset
-  #   c("Amphisbaenia",
-  #     "Crocodylia",
-  #     "Lacertilia",
-  #     "Serpentes",
-  #     "Sphenodon",
-  #     "Testudines")
+    # c("Amphisbaenia",
+    #   "Crocodylia",
+    #   "Lacertilia",
+    #   "Serpentes",
+    #   "Sphenodon",
+    #   "Testudines")
 
   for(ord in orders){
     # ord <- orders[2]

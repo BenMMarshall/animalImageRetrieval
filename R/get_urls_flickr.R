@@ -1,9 +1,12 @@
 #' Search for image locations on flickr
 #'
 #' @name get_urls_flickr
-#' @description A
-#' @param abc abc
-#' @return a
+#' @description A wrapper to search through species for search_flickr. Will use the tags c("snake", "reptile", "tortoise", "turtle", "lizard", "crocodile", "alligator",
+#' "crocodilian", "amphisbaenian", "tuatara", "gharial", "caiman")
+#' @param reptileData Reptile database data from the read_reptile_data() function
+#' @param subset Required. A family subset to work with, can be a single family.
+#' @param flickrAPI Required. An api key provided by flickr.
+#' @return A dataframe of images resulting from the search
 #'
 #' @export
 get_urls_flickr <- function(reptileData, subset, flickrAPI){
@@ -29,10 +32,6 @@ get_urls_flickr <- function(reptileData, subset, flickrAPI){
   for(sp in species){
     i <- i + 1
     # sp <- species[1]
-    ### SOMETHING WRONG WITH SPECIAL CHARACTERS HERE FOR THIS SPECIES
-    # if(sp %in% c("Acanthodactylus aegyptius")){
-    #   {next}
-    # }
 
     # check if there is already progress in the results and load if there is
     if(i == 1 & (any(list.files(here("data", "flickr")) %in% paste0(subset, "_flickr_results.Rds")))){
@@ -53,16 +52,6 @@ get_urls_flickr <- function(reptileData, subset, flickrAPI){
                                content_type = "1", # photos only
                                extra_call = "date_taken,geo,license",
                                page_call = "250")
-
-    # possible beginnings of converting the urls to a downloadable link, but doesn't appear to work with download()
-    # # https://www.flickr.com/photos/naturestills/16073589879/sizes/o/
-    # images <- read_html("https://www.flickr.com/photos/naturestills/16073589879/sizes/o/",
-    #                     encoding = "UTF-8") %>%
-    #   html_elements("img") %>%
-    #   html_attr("src")
-    #
-    # # https://live.staticflickr.com/8601/16073589879_f691c4242c_o.jpg
-    # images[str_detect(images, "live.staticflickr")]
 
     meta.results[[sp]] <- flickr.df[[1]]
     saveRDS(meta.results, file = here("data", "flickr", paste0(subset, "_flickr_meta.Rds")), compress = FALSE)

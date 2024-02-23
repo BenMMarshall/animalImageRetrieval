@@ -1,9 +1,9 @@
 #' Get info from wiki searches
 #'
 #' @name search_wiki
-#' @description A
-#' @param abc abc
-#' @return a
+#' @description A function to search wikimedia for images.
+#' @param searchterm Species search term
+#' @return A dataframe of wikimedia results.
 #'
 #' @export
 search_wiki <- function(searchterm = NA){

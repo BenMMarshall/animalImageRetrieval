@@ -1,9 +1,10 @@
 #' Download the images and save in source folder
 #'
 #' @name get_imgs
-#' @description A
-#' @param abc abc
-#' @return a
+#' @description A wrapper to get the images from the other functions.
+#' @param urlData The urlData that is one of the dataframes from teh get_url functions
+#' @param source The source, each requires a slightly different approach and need to be saved in another location.
+#' @return Nothing in R, saves images to directory.
 #'
 #' @export
 get_imgs <- function(urlData, source, flickrAPI){

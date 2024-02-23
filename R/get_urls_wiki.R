@@ -1,9 +1,10 @@
 #' Search for image locations on wikimedia
 #'
 #' @name get_urls_wiki
-#' @description A
-#' @param abc abc
-#' @return a
+#' @description A wrapper for the search_wiki function to loop through many species.
+#' @param reptileData Reptile database data from the read_reptile_data() function
+#' @param subset Required. A family subset to work with, can be a single family.
+#' @return A dataframe of images resulting from the search
 #'
 #' @export
 get_urls_wiki <- function(reptileData, subset){

@@ -10,8 +10,11 @@ library(here)
 
 # Set target options:
 tar_option_set(
-  packages = c("tibble", "here",
-               "spocc", "dplyr", "readr",
+  packages = c("tibble",
+               "here",
+               "spocc",
+               "dplyr",
+               "readr",
                "downloader",
                "xml2",
                "rvest",
@@ -37,30 +40,38 @@ dir.create(here::here("data", "hmap", "images"), showWarnings = FALSE)
 # tar_make_clustermq() configuration (okay to leave alone):
 options(clustermq.scheduler = "multiprocess")
 
-# tar_make_future() configuration (okay to leave alone):
-# Install packages {{future}}, {{future.callr}}, and {{future.batchtools}} to allow use_targets() to configure tar_make_future() options.
-
 # Run the R scripts in the R/ folder with your custom functions:
 tar_source()
 # source("other_functions.R") # Source other scripts as needed. # nolint
 
-reptileData <- animalImageRetrieval::read_reptile_data()
+# can filter the reptileDB data by order family or species, if filtering here
+# then also filter in the targets pipeline required
+reptileData <- animalImageRetrieval::read_reptile_data(orderFilter = "Serpentes",
+                                                       familyFilter = NULL,
+                                                       speciesFilter = NULL)
 
 values_family <- data.frame(family = unique(reptileData$Family))
 
-values_orders <-
-  data.frame(order = c("Amphisbaenia",
-    "Crocodylia",
-    "Lacertilia",
-    "Serpentes",
-    "Sphenodon",
-    "Testudines"))
+# values_orders <-
+#   data.frame(order = c("Amphisbaenia",
+#     "Crocodylia",
+#     "Lacertilia",
+#     "Serpentes",
+#     "Sphenodon",
+#     "Testudines"))
 
-# Replace the target list below with your own:
+# order is the subdivisions required for hmap
+values_orders <-
+  data.frame(order = c(
+    "Serpentes"))
+
+# TARGETS PIPELINE - use targets::tar_visnetwork() is view
 tarList_imageSearch <- list(
   tar_target(
     name = tar_reptileData,
-    command = read_reptile_data()
+    command = read_reptile_data(orderFilter = "Serpentes",
+                                familyFilter = NULL,
+                                speciesFilter = NULL)
   ),
   tar_target(
     name = tar_flickrAPI,
@@ -70,38 +81,48 @@ tarList_imageSearch <- list(
     values = values_family,
     tar_target(
       name = tar_flickrUrldata,
-      command = get_urls_flickr(reptileData = tar_reptileData, subset = family, flickrAPI = tar_flickrAPI)
+      command = get_urls_flickr(reptileData = tar_reptileData,
+                                subset = family,
+                                flickrAPI = tar_flickrAPI)
     ),
     tar_target(
       name = tar_inatUrldata,
-      command = get_urls_inat(reptileData = tar_reptileData, subset = family)
+      command = get_urls_inat(reptileData = tar_reptileData,
+                              subset = family,
+                              inatLimit = 50)
     ),
     tar_target(
       name = tar_wikiUrldata,
-      command = get_urls_wiki(reptileData = tar_reptileData, subset = family)
+      command = get_urls_wiki(reptileData = tar_reptileData,
+                              subset = family)
     ),
     tar_target(
       name = tar_flickrImages,
-      command = get_imgs(urlData = tar_flickrUrldata, source = "flickr")
+      command = get_imgs(urlData = tar_flickrUrldata,
+                         source = "flickr")
     ),
     tar_target(
       name = tar_inatImages,
-      command = get_imgs(urlData = tar_inatUrldata, source = "inat")
+      command = get_imgs(urlData = tar_inatUrldata,
+                         source = "inat")
     ),
     tar_target(
       name = tar_wikiImages,
-      command = get_imgs(urlData = tar_wikiUrldata, source = "wiki")
+      command = get_imgs(urlData = tar_wikiUrldata,
+                         source = "wiki")
     )
   ),
   tar_map(
     values = values_orders,
     tar_target(
       name = tar_hmapUrldata,
-      command = get_urls_hmap(reptileData = tar_reptileData, subset = order)
+      command = get_urls_hmap(reptileData = tar_reptileData,
+                              subset = order)
     ),
     tar_target(
       name = tar_hmapImages,
-      command = get_imgs_hmap(tar_hmapUrldata, source = "hmap")
+      command = get_imgs_hmap(tar_hmapUrldata,
+                              source = "hmap")
     )
   )
 )
