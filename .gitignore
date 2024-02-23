@@ -1,6 +1,7 @@
 /data/
 # exception to the rule
 !data/reptile_checklist_2023_09.csv
+/notebook/flickrAPIkey.txt
 
 # History files
 .Rhistory

@@ -4,14 +4,22 @@
 \alias{read_reptile_data}
 \title{Read in reptile database data}
 \usage{
-read_reptile_data()
+read_reptile_data(
+  orderFilter = NULL,
+  familyFilter = NULL,
+  speciesFilter = NULL
+)
 }
 \arguments{
-\item{abc}{abc}
+\item{orderFilter}{character string to filter by order, must be present in Order column}
+
+\item{familyFilter}{character string to filter by family, must be present in Family column}
+
+\item{speciesFilter}{character string to filter by species, must be present in Species column}
 }
 \value{
 a
 }
 \description{
-A
+Simple filter wrapper for reading in the provided reptiledatabase data
 }

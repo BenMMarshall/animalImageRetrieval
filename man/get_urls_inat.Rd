@@ -4,14 +4,18 @@
 \alias{get_urls_inat}
 \title{Search for image locations on iNat}
 \usage{
-get_urls_inat(reptileData, subset)
+get_urls_inat(reptileData, subset, inatLimit = 10000)
 }
 \arguments{
-\item{abc}{abc}
+\item{reptileData}{Reptile database data from the read_reptile_data() function}
+
+\item{subset}{Required. A family subset to work with, can be a single family.}
+
+\item{inatLimit}{Limit of the number of inat observations to collect, hard limit of 10000. Default of 10000.}
 }
 \value{
-a
+A dataframe of photos
 }
 \description{
-A
+Will search inaturalist using the spocc package and incrementally save the results.
 }

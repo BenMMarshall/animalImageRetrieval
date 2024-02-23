@@ -4,14 +4,19 @@
 \alias{get_urls_flickr}
 \title{Search for image locations on flickr}
 \usage{
-get_urls_flickr()
+get_urls_flickr(reptileData, subset, flickrAPI)
 }
 \arguments{
-\item{abc}{abc}
+\item{reptileData}{Reptile database data from the read_reptile_data() function}
+
+\item{subset}{Required. A family subset to work with, can be a single family.}
+
+\item{flickrAPI}{Required. An api key provided by flickr.}
 }
 \value{
-a
+A dataframe of images resulting from the search
 }
 \description{
-A
+A wrapper to search through species for search_flickr. Will use the tags c("snake", "reptile", "tortoise", "turtle", "lizard", "crocodile", "alligator",
+"crocodilian", "amphisbaenian", "tuatara", "gharial", "caiman")
 }
