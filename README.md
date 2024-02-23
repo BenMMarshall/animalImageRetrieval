@@ -9,15 +9,27 @@
 The goal of animalImageRetrieval is to enable quick download of reptile
 images from online sources.
 
-## Installation
+## Installation (easy)
 
-You can install the development version of animalImageRetrieval from
-[GitHub](https://github.com/) with:
+Download the entire repo and use targets::tar_source() to load all R
+functions in the R folder into your environment.
+
+## Installation (untested)
+
+You may be able to install the development version of
+animalImageRetrieval from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("BenMMarshall/animalImageRetrieval")
 ```
+
+## A note about API keys
+
+You will need an API keyy from Flickr to run any of the Flickr-related
+functions, as well as the overall targets pipeline. You can remove the
+Flickr related sections in the \_targets.R file to run the pipeline
+otherwise.
 
 ## Example
 
